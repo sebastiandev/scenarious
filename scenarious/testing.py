@@ -1,4 +1,8 @@
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 from functools import wraps
 from .type_handlers.base import TypeHandlerLoader
 from .scenario import Scenario
