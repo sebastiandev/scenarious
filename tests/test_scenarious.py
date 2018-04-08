@@ -1,7 +1,12 @@
 import unittest
 from uuid import uuid4
 from random import randint
-from StringIO import StringIO
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 from scenarious.util import DictObject
 from scenarious.type_handlers.base import faker, TypeHandlerException
 from scenarious import Scenario, TypeHandler

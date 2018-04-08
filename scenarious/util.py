@@ -29,11 +29,11 @@ class DictObject(dict):
 
 
 def module_path(module_name, *args):
-    if isinstance(module_name, basestring) and '.py' in module_name:
+    if isinstance(module_name, str) and '.py' in module_name:
         path = os.path.realpath(module_name)
 
     else:
-        module_name = module_name.__module__ if not isinstance(module_name, basestring) else module_name
+        module_name = module_name.__module__ if not isinstance(module_name, str) else module_name
         path = os.path.realpath(sys.modules[module_name].__file__)
 
     return path

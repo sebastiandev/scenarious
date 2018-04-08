@@ -1,4 +1,5 @@
 import yaml
+import six
 from functools import partial
 from collections import defaultdict, OrderedDict
 from .reference_handler import ReferenceException, ReferenceHandler
@@ -27,7 +28,7 @@ class Scenario(object):
             raw = source
 
         else:
-            raw = yaml.load(open(source) if isinstance(source, (str, unicode)) else source)
+            raw = yaml.load(open(source) if isinstance(source, six.string_types) else source)
 
         type_handlers_by_name = {th.__type_name__: th for th in type_handlers}
         reference_handler = reference_handler or ReferenceHandler()
@@ -191,7 +192,7 @@ class Scenario(object):
             for method, param in special_methods:
                 params = [new_obj]
 
-                if isinstance(param, (str, unicode)):
+                if isinstance(param, six.string_types):
                     params.append(self._resolve_reference(param) if self._ref_handler.is_reference(param) else param)
 
                 elif type(param) in (list, tuple):

@@ -1,3 +1,6 @@
+import six
+
+
 class ReferenceException(Exception):
     pass
 
@@ -8,7 +11,7 @@ class ReferenceHandler(object):
 
     @classmethod
     def is_reference(cls, value):
-        return value.startswith(cls.REFERENCE) if isinstance(value, (str, unicode)) else False
+        return value.startswith(cls.REFERENCE) if isinstance(value, six.string_types) else False
 
     @classmethod
     def parse(cls, ref):
