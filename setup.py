@@ -14,12 +14,12 @@ def get_version(package):
 setup(
     name='scenarious',
     setup_requires=[
-        'yaml',
+        'pyyaml',
         'faker',
         'dateparser',
     ],
     install_requires=[
-        'yaml',
+        'pyyaml',
         'faker',
         'dateparser',
     ],
