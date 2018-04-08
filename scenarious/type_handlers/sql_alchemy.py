@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from base import TypeHandler, TypeHandlerLoader
+from scenarious.type_handlers.base import TypeHandler, TypeHandlerLoader
 
 
 class SQLAlchemyTypeHandlerException(Exception):

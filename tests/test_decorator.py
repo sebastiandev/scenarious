@@ -1,6 +1,6 @@
 import unittest
 from scenarious.testing import scenario, ScenariousBaseTest
-from test_scenarious import ActorTypeHandler
+from tests.test_scenarious import ActorTypeHandler
 
 
 class ScenariousFixtureWithTestClassTest(ScenariousBaseTest):
