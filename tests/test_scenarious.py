@@ -91,8 +91,8 @@ class ScenariousTest(unittest.TestCase):
         assert s.actors
         assert 2 == len(s.actors)
 
-        assert 'test1' == s._objects['actor'][1].name
-        assert 'test2' == s._objects['actor'][3].name
+        assert 'test1' == s.by_id('actors', 1).name
+        assert 'test2' == s.by_id('actors', 3).name
 
     def test_mix_auto_generated_and_custom_ids(self):
         s = Scenario.load(StringIO("""
@@ -111,10 +111,10 @@ class ScenariousTest(unittest.TestCase):
         assert s.actors
         assert 3 == len(s.actors)
 
-        assert 'test3' == s._objects['actor'][1].name
-        assert 'test2' == s._objects['actor'][2].name
+        assert 'test3' == s.by_id('actors', 1).name
+        assert 'test2' == s.by_id('actors', 2).name
         # should've been forced to relocate because of test33 having id:1
-        assert 'test1' == s._objects['actor'][3].name
+        assert 'test1' == s.by_id('actors', 3).name
 
     def test_get_object_by_id(self):
         s = Scenario.load(StringIO("""
@@ -165,8 +165,8 @@ class ScenariousTest(unittest.TestCase):
 
         assert s.actors
         assert s.movies
-        assert 'test' == s._objects['movie'][1].actor.name
-        assert 'test2' == s._objects['movie'][2].actor.name
+        assert 'test' == s.by_id('movies', 1).actor.name
+        assert 'test2' == s.by_id('movies', 2).actor.name
 
     def test_load_defaults(self):
         config = StringIO("""
