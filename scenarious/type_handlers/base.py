@@ -113,7 +113,7 @@ class TypeHandler(object):
 
     @classmethod
     def _format_data(cls, data):
-        for attr, value in data.iteritems():
+        for attr, value in iter(data.items()):
             if isinstance(value, six.string_types) and cls._is_datetime_attribute(attr):
                 data[attr] = cls._parse_date(value)
 

@@ -47,7 +47,7 @@ class Scenario(object):
         for _type in load_priority:
             self._load_type_definition(self._get_type_name(_type))
 
-        for _type, type_def in self._raw_data.iteritems():
+        for _type, type_def in iter(self._raw_data.items()):
             if _type not in load_priority:
                 self._load_type_definition(self._get_type_name(_type), type_def)
 
