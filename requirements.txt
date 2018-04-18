@@ -1,4 +1,4 @@
 six
-pyyaml
+pyaml
 faker
 dateparser

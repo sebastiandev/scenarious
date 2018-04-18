@@ -15,13 +15,13 @@ setup(
     name='scenarious',
     setup_requires=[
         'six',
-        'pyyaml',
+        'pyaml',
         'faker',
         'dateparser',
     ],
     install_requires=[
         'six',
-        'pyyaml',
+        'pyaml',
         'faker',
         'dateparser',
     ],

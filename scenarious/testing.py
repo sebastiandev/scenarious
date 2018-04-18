@@ -11,6 +11,7 @@ from .scenario import Scenario
 class ScenariousBaseTest(object):
 
     scenario_handler = Scenario
+    type_handler_loader = TypeHandlerLoader
 
     def __init__(self, *args, **kwargs):
         self._scenario = None
@@ -24,7 +25,7 @@ class ScenariousBaseTest(object):
             data = StringIO(data_stream)
 
         scenario_class = scenario_class or cls.scenario_handler
-        return scenario_class.load(data, handlers or TypeHandlerLoader.load())
+        return scenario_class.load(data, handlers or cls.type_handler_loader.load())
 
     def create_scenario(self, data_stream=None, handlers=None):
         self._scenario = self.build_scenario(data_stream, handlers)
