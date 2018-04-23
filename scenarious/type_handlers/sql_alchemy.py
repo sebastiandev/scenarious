@@ -43,7 +43,8 @@ class SQLAlchemyTypeHandler(TypeHandler):
                and k not in cls.__model__.__dict__ \
                and k not in base_attrs \
                and k not in required_fields:
-                data.pop(k)
+                raise SQLAlchemyTypeHandlerException("'{}' is not a required attribute nor an attribute from '{}'"
+                                                     .format(k, cls.__model__.__class__.__name__))
 
     @classmethod
     def _do_create(cls, data):

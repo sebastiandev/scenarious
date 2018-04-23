@@ -9,7 +9,7 @@ except ImportError:
 
 from scenarious.util import DictObject
 from scenarious.type_handlers.base import faker, TypeHandlerException
-from scenarious import Scenario, TypeHandler
+from scenarious import Scenario, TypeHandler, ScenariousException
 
 
 class TestTypeHandler(TypeHandler):
@@ -93,6 +93,40 @@ class ScenariousTest(unittest.TestCase):
 
         assert 'test1' == s.by_id('actors', 1).name
         assert 'test2' == s.by_id('actors', 3).name
+
+    def test_alias_objects(self):
+        s = Scenario.load(StringIO("""
+        actors:
+          - id: 1
+            alias: test1
+            name: test1
+            age: 20
+
+          - id: 3
+            name: test2
+            age: 22
+        """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
+
+        assert s.actors
+        assert 2 == len(s.actors)
+
+        assert 'test1' == s.by_id('actors', 'test1').name
+        assert not s.by_id('actors', 'test2')  # id:3 has no alias
+
+    def test_fail_with_duplicate_alias(self):
+        scene = StringIO("""
+        actors:
+          - id: 1
+            alias: xx
+            name: test1
+            age: 20
+
+          - id: 3
+            alias: xx
+            name: test2
+            age: 22
+        """)
+        self.assertRaises(ScenariousException, Scenario.load, scene, type_handlers=[ActorTypeHandler, MovieTypeHandler])
 
     def test_mix_auto_generated_and_custom_ids(self):
         s = Scenario.load(StringIO("""

@@ -23,7 +23,10 @@ class TypeHandler(object):
     __requires__ = None
 
     def __init__(self, **kwargs):
-        pass
+        for k in self.requirements():
+            if hasattr(self, k):
+                raise TypeHandlerException("Field '{}' is required but also has a default value. "
+                                           "Required fields cannot have default values".format(k))
 
     @classmethod
     def requirements(cls):
