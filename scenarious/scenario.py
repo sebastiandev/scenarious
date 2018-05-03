@@ -86,13 +86,13 @@ class Scenario(object):
                 raise AttributeError("%s doesn't have type '%s'" % (self.__class__.__name__, type_name))
 
     def _get_type_name(self, name):
-        return name.rstrip('s')
+        return name[:-3] + 'y' if name[-3:] == 'ies' else name.rstrip('s')
 
     def _get_type_handler(self, name):
         # We try name and name without last letter, in case plural is used
         handler = self._type_handlers.get(name, self._type_handlers.get(self._get_type_name(name), None))
         if not handler:
-            raise ScenariousException("Invalid type name '{}'".format(name))
+            raise ScenariousException("Invalid type name, no TypeHandler could be found for type '{}'".format(name))
 
         return handler
 
@@ -123,7 +123,10 @@ class Scenario(object):
 
         # We might have not loaded a needed dependency yet, so try to load it first
         if not self._entity_store.has_type(ref_key_type):
-            self._load_type_definition(ref_key_type)
+            try:
+                self._load_type_definition(ref_key_type)
+            except Exception as e:
+                raise ScenariousException("Reference error, couldn't find type '{}'".format(ref_key_type))
 
         value = self._entity_store.get(ref_key_type, ref_key_id)
         for attr in ref_attrs:
