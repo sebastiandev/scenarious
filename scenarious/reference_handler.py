@@ -21,7 +21,7 @@ class ReferenceHandler(object):
 
             ref_key_parts = ref_key.split('_')
             ref_key_type = '_'.join(ref_key_parts[:-1])
-            ref_key_id = int(ref_key_parts[-1])
+            ref_key_id = ref_key_parts[-1]
 
             ref_attrs = ref_parts[1:] if len(ref_parts) > 1 else []
 

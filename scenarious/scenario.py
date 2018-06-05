@@ -13,8 +13,6 @@ class ScenariousException(Exception):
 
 class Scenario(object):
 
-    ID = 'id'
-
     @classmethod
     def load(cls, source, type_handlers, load_priority=None, reference_handler=None, entity_store=None):
         """
@@ -32,7 +30,11 @@ class Scenario(object):
         else:
             raw = yaml.load(open(source) if isinstance(source, six.string_types) else source)
 
-        type_handlers_by_name = {th.__type_name__: th for th in type_handlers}
+        type_handlers_by_name = {}
+        for th in type_handlers:
+            names = th.__type_name__ if type(th.__type_name__) in [list, tuple] else [th.__type_name__]
+            type_handlers_by_name.update({name: th for name in names})
+
         reference_handler = reference_handler or ReferenceHandler()
         entity_store = entity_store or EntityStore()
 
@@ -86,7 +88,7 @@ class Scenario(object):
                 raise AttributeError("%s doesn't have type '%s'" % (self.__class__.__name__, type_name))
 
     def _get_type_name(self, name):
-        return name[:-3] + 'y' if name[-3:] == 'ies' else name.rstrip('s')
+        return name.rstrip('s')
 
     def _get_type_handler(self, name):
         # We try name and name without last letter, in case plural is used

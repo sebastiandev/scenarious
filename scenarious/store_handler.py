@@ -1,3 +1,4 @@
+import six
 from collections import defaultdict, OrderedDict
 
 
@@ -15,7 +16,7 @@ class EntityStoreException(Exception):
 class EntityStore(object):
 
     ID = 'id'
-    ALIAS = 'alias'
+    ALIAS = '_alias'
 
     def __init__(self):
         self._objects = defaultdict(dict)
@@ -77,8 +78,20 @@ class EntityStore(object):
         return entity_id
 
     def get(self, type_name, ref):
-        return self._aliased_objects.get(type_name, {}).get(ref, None) or \
-               self._objects.get(type_name, {}).get(ref, None)
+        e = self._aliased_objects.get(type_name, {}).get(ref, None) \
+            or self._objects.get(type_name, {}).get(ref, None)
+
+        try:
+            if not e and type(ref) in [int, float]:
+                e = self._objects.get(type_name, {}).get(six.string_types(ref), None)
+
+            if not e and isinstance(ref, six.string_types):
+                e = self._objects.get(type_name, {}).get(int(ref), None)
+
+        except:
+            pass
+
+        return e
 
     def all(self, type_name):
         return self._objects.get(type_name, {}).values()

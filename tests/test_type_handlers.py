@@ -12,7 +12,7 @@ from scenarious.type_handlers.base import faker, TypeHandlerException
 from scenarious import Scenario, TypeHandler
 
 
-class TestTypeHandler(TypeHandler):
+class BaseTestTypeHandler(TypeHandler):
 
     @classmethod
     def _do_create(cls, data):
@@ -23,7 +23,7 @@ class TestTypeHandler(TypeHandler):
 class TypeHandlerTest(unittest.TestCase):
 
     def test_fail_when_defaulting_a_required_field(self):
-        class BadActorTypeHandler(TestTypeHandler):
+        class BadActorTypeHandler(BaseTestTypeHandler):
             __type_name__ = 'actor'
             __requires__ = ['name']
 
@@ -33,7 +33,7 @@ class TypeHandlerTest(unittest.TestCase):
         self.assertRaises(TypeHandlerException, BadActorTypeHandler)
 
     def test_fail_when_missing_required_field(self):
-        class ActorTypeHandler(TestTypeHandler):
+        class ActorTypeHandler(BaseTestTypeHandler):
             __type_name__ = 'actor'
             __requires__ = ['name']
 

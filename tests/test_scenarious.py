@@ -12,7 +12,7 @@ from scenarious.type_handlers.base import faker, TypeHandlerException
 from scenarious import Scenario, TypeHandler, ScenariousException
 
 
-class TestTypeHandler(TypeHandler):
+class BaseTestTypeHandler(TypeHandler):
 
     @classmethod
     def _do_create(cls, data):
@@ -20,7 +20,7 @@ class TestTypeHandler(TypeHandler):
         return DictObject(**data)
 
 
-class ActorTypeHandler(TestTypeHandler):
+class ActorTypeHandler(BaseTestTypeHandler):
 
     __type_name__ = 'actor'
     __requires__ = ['name']
@@ -28,7 +28,7 @@ class ActorTypeHandler(TestTypeHandler):
     age = lambda: randint(18, 80)
 
 
-class FilmTypeHandler(TestTypeHandler):
+class FilmTypeHandler(BaseTestTypeHandler):
 
     __requires__ = ['title', 'genre']
 
@@ -46,7 +46,7 @@ class TVShowTypeHandler(FilmTypeHandler):
     __requires__ = ['seasons']
 
 
-class GenreTypeHandler(TestTypeHandler):
+class GenreTypeHandler(BaseTestTypeHandler):
     __type_name__ = 'genre'
 
     name = lambda: faker.random_sample(['drama', 'comedy', 'action'], length=1)[0]
@@ -79,11 +79,11 @@ class ScenariousTest(unittest.TestCase):
     def test_custom_ids(self):
         s = Scenario.load(StringIO("""
         actors:
-          - id: 1
+          - _id: 1
             name: test1
             age: 20
 
-          - id: 3
+          - _id: 3
             name: test2
             age: 22
         """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
@@ -97,12 +97,12 @@ class ScenariousTest(unittest.TestCase):
     def test_alias_objects(self):
         s = Scenario.load(StringIO("""
         actors:
-          - id: 1
-            alias: test1
+          - _id: 1
+            _alias: test1
             name: test1
             age: 20
 
-          - id: 3
+          - _id: 3
             name: test2
             age: 22
         """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
@@ -116,13 +116,13 @@ class ScenariousTest(unittest.TestCase):
     def test_fail_with_duplicate_alias(self):
         scene = StringIO("""
         actors:
-          - id: 1
-            alias: xx
+          - _id: 1
+            _alias: xx
             name: test1
             age: 20
 
-          - id: 3
-            alias: xx
+          - _id: 3
+            _alias: xx
             name: test2
             age: 22
         """)
@@ -137,7 +137,7 @@ class ScenariousTest(unittest.TestCase):
           - name: test2
             age: 22
 
-          - id: 1
+          - _id: 1
             name: test3
             age: 33
         """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
@@ -147,7 +147,7 @@ class ScenariousTest(unittest.TestCase):
 
         assert 'test3' == s.by_id('actors', 1).name
         assert 'test2' == s.by_id('actors', 2).name
-        # should've been forced to relocate because of test33 having id:1
+        # should've been forced to relocate because of test33 having _id:1
         assert 'test1' == s.by_id('actors', 3).name
 
     def test_get_object_by_id(self):
@@ -156,7 +156,7 @@ class ScenariousTest(unittest.TestCase):
           - name: test
             age: 20
 
-          - id: 2
+          - _id: 2
             name: test2
             age: 22
 
@@ -181,7 +181,7 @@ class ScenariousTest(unittest.TestCase):
           - name: test
             age: 20
 
-          - id: 2
+          - _id: 2
             name: test2
             age: 22
 
@@ -194,6 +194,35 @@ class ScenariousTest(unittest.TestCase):
           - title: test movie 2
             genre: action
             actor: $actor_2
+            year: 2018
+        """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
+
+        assert s.actors
+        assert s.movies
+        assert 'test' == s.by_id('movies', 1).actor.name
+        assert 'test2' == s.by_id('movies', 2).actor.name
+
+    def test_reference_object_by_alias(self):
+        s = Scenario.load(StringIO("""
+        actors:
+          - _alias: test1
+            name: test
+            age: 20
+
+          - _alias: test2
+            _id: 2
+            name: test2
+            age: 22
+
+        movies:
+          - title: test movie 1
+            genre: drama
+            actor: $actor_test1
+            year: 2018
+
+          - title: test movie 2
+            genre: action
+            actor: $actor_test2
             year: 2018
         """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
 
@@ -236,7 +265,7 @@ class ScenariousTest(unittest.TestCase):
           - name: test
             age: 20
 
-          - id: 2
+          - _id: 2
             name: test2
             age: 22
 
