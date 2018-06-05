@@ -39,7 +39,8 @@ class SQLAlchemyTypeHandler(TypeHandler):
         base_attrs = cls._base_attributes(cls)
 
         for k in data.keys():
-            if not hasattr(cls.__model__, k) \
+            if not k.startswith('__') and \
+               not hasattr(cls.__model__, k) \
                and k not in cls.__model__.__dict__ \
                and k not in base_attrs \
                and k not in required_fields:
