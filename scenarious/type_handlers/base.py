@@ -34,11 +34,12 @@ class TypeHandler(object):
         Gets the requirements from every handler's parent
         :return: list of required attributes
         """
-        reqs = cls.__requires__ or []
+        reqs = set(cls.__requires__ or [])
 
         for base in cls.__bases__:
             if hasattr(base, '__requires__'):
-                reqs.extend(base.__requires__ or [])
+                for e in list(base.__requires__ or []):
+                    reqs.add(e)
 
         return reqs
 

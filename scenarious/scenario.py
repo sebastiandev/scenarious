@@ -32,7 +32,7 @@ class Scenario(object):
 
         type_handlers_by_name = {}
         for th in type_handlers:
-            names = th.__type_name__ if type(th.__type_name__) in [list, tuple] else [th.__type_name__]
+            names = th.__type_name__ if type(th.__type_name__) in [list, tuple] else [th.__type_name__, th.__type_name__ + 's']
             type_handlers_by_name.update({name: th for name in names})
 
         reference_handler = reference_handler or ReferenceHandler()

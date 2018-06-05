@@ -79,11 +79,11 @@ class ScenariousTest(unittest.TestCase):
     def test_custom_ids(self):
         s = Scenario.load(StringIO("""
         actors:
-          - _id: 1
+          - id: 1
             name: test1
             age: 20
 
-          - _id: 3
+          - id: 3
             name: test2
             age: 22
         """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
@@ -97,12 +97,12 @@ class ScenariousTest(unittest.TestCase):
     def test_alias_objects(self):
         s = Scenario.load(StringIO("""
         actors:
-          - _id: 1
+          - id: 1
             _alias: test1
             name: test1
             age: 20
 
-          - _id: 3
+          - id: 3
             name: test2
             age: 22
         """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
@@ -116,12 +116,12 @@ class ScenariousTest(unittest.TestCase):
     def test_fail_with_duplicate_alias(self):
         scene = StringIO("""
         actors:
-          - _id: 1
+          - id: 1
             _alias: xx
             name: test1
             age: 20
 
-          - _id: 3
+          - id: 3
             _alias: xx
             name: test2
             age: 22
@@ -137,7 +137,7 @@ class ScenariousTest(unittest.TestCase):
           - name: test2
             age: 22
 
-          - _id: 1
+          - id: 1
             name: test3
             age: 33
         """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
@@ -156,7 +156,7 @@ class ScenariousTest(unittest.TestCase):
           - name: test
             age: 20
 
-          - _id: 2
+          - id: 2
             name: test2
             age: 22
 
@@ -181,7 +181,7 @@ class ScenariousTest(unittest.TestCase):
           - name: test
             age: 20
 
-          - _id: 2
+          - id: 2
             name: test2
             age: 22
 
@@ -210,7 +210,7 @@ class ScenariousTest(unittest.TestCase):
             age: 20
 
           - _alias: test2
-            _id: 2
+            id: 2
             name: test2
             age: 22
 
@@ -265,7 +265,7 @@ class ScenariousTest(unittest.TestCase):
           - name: test
             age: 20
 
-          - _id: 2
+          - id: 2
             name: test2
             age: 22
 
