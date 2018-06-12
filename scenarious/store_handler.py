@@ -25,7 +25,7 @@ class EntityStore(object):
 
     @classmethod
     def parse_obj_def(cls, obj_def):
-        return EntityID(obj_def.pop(cls.ID, None), obj_def.pop(cls.ALIAS, None)), obj_def
+        return EntityID(obj_def.get(cls.ID, None), obj_def.pop(cls.ALIAS, None)), obj_def
 
     def _relocate_object(self, obj_id, type_name):
         """

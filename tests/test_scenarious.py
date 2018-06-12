@@ -16,7 +16,9 @@ class BaseTestTypeHandler(TypeHandler):
 
     @classmethod
     def _do_create(cls, data):
-        data['id'] = str(uuid4())
+        if 'id' not in data:
+            data['id'] = str(uuid4())
+
         return DictObject(**data)
 
 
@@ -91,8 +93,14 @@ class ScenariousTest(unittest.TestCase):
         assert s.actors
         assert 2 == len(s.actors)
 
-        assert 'test1' == s.by_id('actors', 1).name
-        assert 'test2' == s.by_id('actors', 3).name
+        actor_1 = s.by_id('actors', 1)
+        actor_3 = s.by_id('actors', 3)
+
+        assert 1 == actor_1.id
+        assert 3 == actor_3.id
+
+        assert 'test1' == actor_1.name
+        assert 'test2' == actor_3.name
 
     def test_alias_objects(self):
         s = Scenario.load(StringIO("""
