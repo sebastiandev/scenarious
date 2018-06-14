@@ -1,7 +1,9 @@
+import sys
 import yaml
 import six
 from functools import partial
 from collections import OrderedDict
+
 from .reference_handler import ReferenceHandler
 from .store_handler import EntityStore
 from .type_handlers.base import TypeHandlerException
@@ -128,7 +130,8 @@ class Scenario(object):
             try:
                 self._load_type_definition(ref_key_type)
             except Exception as e:
-                raise ScenariousException("Reference error, couldn't find type '{}'".format(ref_key_type))
+                trace = sys.exc_info()[2]
+                raise ScenariousException("Reference error, couldn't find type '{}'".format(ref_key_type)), None, trace
 
         value = self._entity_store.get(ref_key_type, ref_key_id)
         for attr in ref_attrs:
@@ -176,13 +179,14 @@ class Scenario(object):
                 method(*params)
 
         except TypeHandlerException as te:
-            raise te
+            raise
 
         except ScenariousException as se:
-            raise se
+            raise
 
         except Exception as e:
-            raise ScenariousException("Error loading type '{}'. Detail: {}".format(type_name, e))
+            trace = sys.exc_info()[2]
+            raise ScenariousException("Error loading type '{}'. Detail: {}".format(type_name, e)), None, trace
 
     def _process_references_and_methods(self, type_name, obj_def, special_methods):
         if type(obj_def) is not dict:
@@ -215,5 +219,3 @@ class Scenario(object):
             raise KeyError("{} doesn't have elements of type '{}'".format(self.__class__.__name__, type_name))
 
         return self._entity_store.get(type_name, ref_id)
-
-
