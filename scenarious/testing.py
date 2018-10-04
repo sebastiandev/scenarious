@@ -29,10 +29,11 @@ class ScenariousBaseTest(object):
             data = StringIO(data_stream) if type(data_stream) is str else data_stream
 
             if not scenario:
-                scenario = scenario_class.load(data, handlers or cls.type_handler_loader.load())
+                scenario = scenario_class.load(data, handlers or cls.type_handler_loader.load(), autobuild=False)
             else:
                 scenario.update(data)
 
+        scenario.build()
         return scenario
 
     def create_scenario(self, *data_streams, **kwargs):

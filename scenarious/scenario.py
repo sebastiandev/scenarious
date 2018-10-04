@@ -15,7 +15,7 @@ class ScenariousException(Exception):
 class Scenario(object):
 
     @classmethod
-    def load(cls, source, type_handlers, load_priority=None, reference_handler=None, entity_store=None):
+    def load(cls, source, type_handlers, load_priority=None, reference_handler=None, entity_store=None, autobuild=True):
         """
         Builds the Scenario based on the scenario definition stored in source, using the provided type handlers
         :param source: A config file path or config file object to load the scenario from or a dict already built
@@ -35,19 +35,18 @@ class Scenario(object):
         entity_store = entity_store or EntityStore()
 
         return cls(source, type_handlers_by_name, reference_handler=reference_handler, entity_store=entity_store,
-                   load_priority=load_priority)
+                   load_priority=load_priority, autobuild=autobuild)
 
-    def __init__(self, source, handlers_by_type_name, reference_handler, entity_store, load_priority=None):
+    def __init__(self, source, handlers_by_type_name, reference_handler, entity_store, load_priority=None, autobuild=True):
         self._raw_data = {}
         self._type_handlers = handlers_by_type_name
         self._ref_handler = reference_handler
         self._entity_store = entity_store
         self._load_priority = load_priority or []
-
-        for _type in self._load_priority:
-            self._load_type_definition(self._get_type_name(_type))
-
         self.update(source)
+
+        if autobuild:
+            self.build()
 
     def update(self, source):
         if isinstance(source, dict):
@@ -59,7 +58,9 @@ class Scenario(object):
             objects = [{}] * value if isinstance(value, int) else value
             self._raw_data[entity] = self._raw_data.get(entity, []) + objects
 
-        self._entity_store.reset()
+    def build(self):
+        for _type in self._load_priority:
+            self._load_type_definition(self._get_type_name(_type))
 
         for _type, type_def in iter(self._raw_data.items()):
             if _type not in self._load_priority:
@@ -222,5 +223,3 @@ class Scenario(object):
             raise KeyError("{} doesn't have elements of type '{}'".format(self.__class__.__name__, type_name))
 
         return self._entity_store.get(type_name, ref_id)
-
-
