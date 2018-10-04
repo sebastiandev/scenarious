@@ -23,6 +23,11 @@ class EntityStore(object):
         self._aliased_objects = defaultdict(dict)
         self._objects_id_counter = defaultdict(lambda: 1)  # start off counter from 1
 
+    def reset(self):
+        self._objects.clear()
+        self._aliased_objects.clear()
+        self._objects_id_counter.clear()
+
     @classmethod
     def parse_obj_def(cls, obj_def):
         return EntityID(obj_def.get(cls.ID, None), obj_def.pop(cls.ALIAS, None)), obj_def
