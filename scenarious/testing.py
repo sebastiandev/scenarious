@@ -39,7 +39,7 @@ class ScenariousBaseTest(object):
         self._scenario = self.build_scenario(*data_streams, **kwargs)
 
     def __getattr__(self, item):
-        if not hasattr(self, '_scenario'):
+        if '_scenario' not in self.__dict__:
             raise AttributeError("ScenariousBaseTest doesnt have attribute {}".format(item))
 
         if hasattr(self._scenario, item):
