@@ -2,12 +2,14 @@ import yaml
 import six
 from functools import partial
 from collections import OrderedDict
+
+from .errors import BaseError
 from .reference_handler import ReferenceHandler
 from .store_handler import EntityStore
 from .type_handlers.base import TypeHandlerException
 
 
-class ScenariousException(Exception):
+class ScenariousException(BaseError):
     pass
 
 
@@ -128,7 +130,7 @@ class Scenario(object):
             try:
                 self._load_type_definition(ref_key_type)
             except Exception as e:
-                raise ScenariousException("Reference error, couldn't find type '{}'".format(ref_key_type))
+                ScenariousException.reraise("Reference error, couldn't find type '{}'".format(ref_key_type), e)
 
         value = self._entity_store.get(ref_key_type, ref_key_id)
         for attr in ref_attrs:
@@ -175,14 +177,11 @@ class Scenario(object):
 
                 method(*params)
 
-        except TypeHandlerException as te:
-            raise te
-
-        except ScenariousException as se:
-            raise se
+        except (TypeHandlerException, ScenariousException):
+            raise
 
         except Exception as e:
-            raise ScenariousException("Error loading type '{}'. Detail: {}".format(type_name, e))
+            ScenariousException.reraise("Error loading type '{}'. Detail: {}".format(type_name, e), e)
 
     def _process_references_and_methods(self, type_name, obj_def, special_methods):
         if type(obj_def) is not dict:

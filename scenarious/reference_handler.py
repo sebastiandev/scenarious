@@ -1,7 +1,9 @@
 import six
 
+from .errors import BaseError
 
-class ReferenceException(Exception):
+
+class ReferenceException(BaseError):
     pass
 
 
@@ -27,5 +29,5 @@ class ReferenceHandler(object):
 
             return ref_key_type, ref_key_id, ref_attrs
 
-        except:
-            raise ReferenceException("Invalid reference '{}'".format(ref))
+        except Exception as e:
+            ReferenceException.reraise("Invalid reference '{}'".format(ref), e)
