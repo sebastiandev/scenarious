@@ -18,31 +18,41 @@ class ScenariousBaseTest(object):
         super(ScenariousBaseTest, self).__init__(*args, **kwargs)
 
     @classmethod
-    def build_scenario(cls, data_stream=None, handlers=None, scenario_class=None):
-        data = data_stream or {}
+    def build_scenario(cls, *data_streams, **kwargs):
+        handlers = kwargs.pop('handlers', None)
+        scenario_class = kwargs.pop('scenario_class', None) or cls.scenario_handler
 
-        if type(data_stream) is str:
-            data = StringIO(data_stream)
+        scenario = None
+        data_streams = data_streams or [{}]
 
-        scenario_class = scenario_class or cls.scenario_handler
-        return scenario_class.load(data, handlers or cls.type_handler_loader.load())
+        for data_stream in data_streams:
+            data = StringIO(data_stream) if type(data_stream) is str else data_stream
 
-    def create_scenario(self, data_stream=None, handlers=None):
-        self._scenario = self.build_scenario(data_stream, handlers)
+            if not scenario:
+                scenario = scenario_class.load(data, handlers or cls.type_handler_loader.load(), autobuild=False)
+            else:
+                scenario.update(data)
+
+        scenario.build()
+        return scenario
+
+    def create_scenario(self, *data_streams, **kwargs):
+        self._scenario = self.build_scenario(*data_streams, **kwargs)
 
     def __getattr__(self, item):
-        if not hasattr(self, '_scenario'):
+        if '_scenario' not in self.__dict__:
             raise AttributeError("ScenariousBaseTest doesnt have attribute {}".format(item))
 
         if hasattr(self._scenario, item):
             r = getattr(self._scenario, item)
             return r if item.endswith('s') else r[0]
-
         else:
             raise AttributeError("ScenariousBaseTest Scenario doesnt have attribute {}(s)".format(item))
 
 
-def scenario(data_stream, handlers=None, scenario_class=None):
+def scenario(*data_streams, **kwargs):
+    handlers = kwargs.pop('handlers', None)
+    scenario_class = kwargs.pop('scenario_class', None)
 
     def test_decorator(f):
         @wraps(f)
@@ -52,11 +62,11 @@ def scenario(data_stream, handlers=None, scenario_class=None):
             # instead of just replace it
 
             if isinstance(self, ScenariousBaseTest):
-                self.create_scenario(data_stream, handlers=handlers)
+                self.create_scenario(*data_streams, handlers=handlers)
                 f(self, *args, **kwargs)
             else:
                 # If not using ScenariousBaseTest, then inject scenario as a test parameter
-                kwargs['scenario'] = ScenariousBaseTest.build_scenario(data_stream,
+                kwargs['scenario'] = ScenariousBaseTest.build_scenario(*data_streams,
                                                                        handlers=handlers,
                                                                        scenario_class=scenario_class)
                 f(self, *args, **kwargs)

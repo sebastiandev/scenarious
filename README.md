@@ -293,10 +293,10 @@ class CustomTest(BaseTest, testing.ScenariousBaseTest):
         alias: Ed
         age: 51
     """)
-    def test_actors_with_decorator(self, scenario):
-        assert 3 == scenario.actors  # we are accessing all the actors
-        assert 'Edward Norton' == scenario.actors[2].name  # we access by order of definition
-        assert 'Edward Norton' == scenario.by_id('actor', 'Ed').name  # we access by alias
+    def test_actors_with_decorator(self):
+        assert 3 == self.actors  # we are accessing all the actors
+        assert 'Edward Norton' == self.actors[2].name  # we access by order of definition
+        assert 'Edward Norton' == self.by_id('actor', 'Ed').name  # we access by alias
 
 class PlainTest(BaseTest):
 

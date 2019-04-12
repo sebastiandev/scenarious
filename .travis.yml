@@ -1,11 +1,25 @@
 language: python
-python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
+
+matrix:
+  fast_finish: true
+  include:
+    - python: 2.7
+      env:
+      - TOX_ENV=py27
+    - python: 3.4
+      env:
+      - TOX_ENV=py34
+    - python: 3.5
+      env:
+      - TOX_ENV=py35
+    - python: 3.6
+      env:
+      - TOX_ENV=py36
+
 # command to install dependencies
-install: "pip install -r requirements.txt"
+install:
+  - travis_retry pip install tox
+
 # command to run tests
-script: 
-  - py.test -v --color=yes
+script:
+  - tox -e $TOX_ENV

@@ -1,5 +1,6 @@
 import yaml
 import six
+import traceback
 from functools import partial
 from collections import OrderedDict
 
@@ -16,7 +17,7 @@ class ScenariousException(BaseError):
 class Scenario(object):
 
     @classmethod
-    def load(cls, source, type_handlers, load_priority=None, reference_handler=None, entity_store=None):
+    def load(cls, source, type_handlers, load_priority=None, reference_handler=None, entity_store=None, autobuild=True):
         """
         Builds the Scenario based on the scenario definition stored in source, using the provided type handlers
         :param source: A config file path or config file object to load the scenario from or a dict already built
@@ -26,11 +27,6 @@ class Scenario(object):
         :param entity_store: An entity store that handles object mapping and retrieval
         :return: A Scenario
         """
-        if isinstance(source, dict):
-            raw = source
-
-        else:
-            raw = yaml.load(open(source) if isinstance(source, six.string_types) else source)
 
         type_handlers_by_name = {}
         for th in type_handlers:
@@ -40,22 +36,36 @@ class Scenario(object):
         reference_handler = reference_handler or ReferenceHandler()
         entity_store = entity_store or EntityStore()
 
-        return cls(raw or {}, type_handlers_by_name, reference_handler=reference_handler, entity_store=entity_store,
-                   load_priority=load_priority)
+        return cls(source, type_handlers_by_name, reference_handler=reference_handler, entity_store=entity_store,
+                   load_priority=load_priority, autobuild=autobuild)
 
-    def __init__(self, data, handlers_by_type_name, reference_handler, entity_store, load_priority=None):
-        self._raw_data = data
+    def __init__(self, source, handlers_by_type_name, reference_handler, entity_store, load_priority=None, autobuild=True):
+        self._raw_data = {}
         self._type_handlers = handlers_by_type_name
         self._ref_handler = reference_handler
         self._entity_store = entity_store
+        self._load_priority = load_priority or []
+        self.update(source)
 
-        load_priority = load_priority or []
+        if autobuild:
+            self.build()
 
-        for _type in load_priority:
+    def update(self, source):
+        if isinstance(source, dict):
+            raw = source
+        else:
+            raw = yaml.load(open(source) if isinstance(source, six.string_types) else source)
+
+        for entity, value in (raw or {}).items():
+            objects = [{}] * value if isinstance(value, int) else value
+            self._raw_data[entity] = self._raw_data.get(entity, []) + objects
+
+    def build(self):
+        for _type in self._load_priority:
             self._load_type_definition(self._get_type_name(_type))
 
         for _type, type_def in iter(self._raw_data.items()):
-            if _type not in load_priority:
+            if _type not in self._load_priority:
                 self._load_type_definition(self._get_type_name(_type), type_def)
 
     def __getattr__(self, key):
@@ -154,8 +164,8 @@ class Scenario(object):
                     self._load_type(type_name, {})
             else:
                 raise ScenariousException(
-                    "Type definition '{}' must be a list, dict or int. Got '{}' instead".format(type_name,
-                                                                                                type(type_def)))
+                    "Type definition '{}' must be a list, dict or int. Got '{}' instead"
+                        .format(type_name, type(type_def)))
 
     def _load_type(self, type_name, type_def):
         try:
@@ -176,7 +186,6 @@ class Scenario(object):
                     params.append(param)
 
                 method(*params)
-
         except (TypeHandlerException, ScenariousException):
             raise
 
@@ -214,5 +223,3 @@ class Scenario(object):
             raise KeyError("{} doesn't have elements of type '{}'".format(self.__class__.__name__, type_name))
 
         return self._entity_store.get(type_name, ref_id)
-
-
