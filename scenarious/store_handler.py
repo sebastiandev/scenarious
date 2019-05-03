@@ -13,6 +13,52 @@ class EntityStoreException(Exception):
     pass
 
 
+class EntityManager(object):
+
+    def __init__(self, type_name, objects=None, aliased_objects=None):
+        self.type_name = type_name
+        self.identifiers = [str(id) for id in objects.keys()]
+        self.objects = list(objects.values())
+        if aliased_objects:
+            self.aliases = list(aliased_objects.keys())
+            self.aliased_objects = list(aliased_objects.values())
+
+    def __repr__(self):
+        return str(self.objects)
+
+    def __getitem__(self, key):
+        try:
+            item = self.objects[key]
+            return item
+        except:
+            raise EntityStoreException(
+                "{} type name has no object with identifier: {}".format(self.type_name, key)
+            )
+
+    def __len__(self):
+        return len(self.objects)
+
+    def __contains__(self, item):
+        return item in self.objects
+
+    def __getattr__(self, name):
+        attr_parts = name.split('_')
+        requested_type_name, requested_identifier = attr_parts
+
+        if requested_type_name != self.type_name:
+            raise EntityStoreException("Invalid type name: {}".format(requested_type_name))
+
+        if requested_identifier not in self.identifiers and requested_identifier not in self.aliases:
+            raise EntityStoreException("Object not found: {}".format(name))
+
+        try:
+            object_index = self.identifiers.index(requested_identifier)
+            return self.objects[object_index]
+        except ValueError:
+            object_index = self.aliases.index(requested_identifier)
+            return self.aliased_objects[object_index]
+
+
 class EntityStore(object):
 
     ID = 'id'
@@ -99,4 +145,6 @@ class EntityStore(object):
         return e
 
     def all(self, type_name):
-        return self._objects.get(type_name, {}).values()
+        objects = self._objects.get(type_name, {})
+        aliased_objects = self._aliased_objects.get(type_name, {})
+        return EntityManager(type_name, objects=objects, aliased_objects=aliased_objects)

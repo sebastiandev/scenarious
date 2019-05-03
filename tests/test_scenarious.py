@@ -8,6 +8,7 @@ except ImportError:
     from io import StringIO
 
 from scenarious.util import DictObject
+from scenarious.store_handler import EntityStoreException
 from scenarious.type_handlers.base import faker, TypeHandlerException
 from scenarious import Scenario, TypeHandler, ScenariousException
 
@@ -72,11 +73,17 @@ class ScenariousTest(unittest.TestCase):
         assert 1 == len(s.actors)
         assert 'test' == s.actors[0].name
         assert 20 == s.actors[0].age
+        # Testing attribute access to objects
+        assert 'test' == s.actors.actor_1.name
+        assert 20 == s.actors.actor_1.age
 
         assert s.movies
         assert 1 == len(s.movies)
         assert 'test movie' == s.movies[0].title
         assert 'drama' == s.movies[0].genre
+        # Testing attribute access to objects
+        assert 'test movie' == s.movies.movie_1.title
+        assert 'drama' == s.movies.movie_1.genre
 
     def test_custom_ids(self):
         s = Scenario.load(StringIO("""
@@ -102,6 +109,15 @@ class ScenariousTest(unittest.TestCase):
         assert 'test1' == actor_1.name
         assert 'test2' == actor_3.name
 
+        # Testing direct attribute access to objects with custom ids
+        actor_1 = s.actors.actor_1
+        actor_3 = s.actors.actor_3
+        assert 1 == actor_1.id
+        assert 3 == actor_3.id
+
+        assert 'test1' == actor_1.name
+        assert 'test2' == actor_3.name
+
     def test_alias_objects(self):
         s = Scenario.load(StringIO("""
         actors:
@@ -120,6 +136,11 @@ class ScenariousTest(unittest.TestCase):
 
         assert 'test1' == s.by_id('actors', 'test1').name
         assert not s.by_id('actors', 'test2')  # id:3 has no alias
+
+        # Testing direct attribute access to objects with custom ids
+        assert 'test1' == s.actors.actor_test1.name
+        with self.assertRaises(EntityStoreException, msg="Object not found: test2"):
+            not s.actors.actor_test2
 
     def test_fail_with_duplicate_alias(self):
         scene = StringIO("""
@@ -157,6 +178,11 @@ class ScenariousTest(unittest.TestCase):
         assert 'test2' == s.by_id('actors', 2).name
         # should've been forced to relocate because of test33 having _id:1
         assert 'test1' == s.by_id('actors', 3).name
+
+        # Testing direct attribute access to objects with custom ids
+        assert 'test3' == s.actors.actor_1.name
+        assert 'test2' == s.actors.actor_2.name
+        assert 'test1' == s.actors.actor_3.name
 
     def test_get_object_by_id(self):
         s = Scenario.load(StringIO("""
@@ -233,7 +259,6 @@ class ScenariousTest(unittest.TestCase):
             actor: $actor_test2
             year: 2018
         """), type_handlers=[ActorTypeHandler, MovieTypeHandler])
-
         assert s.actors
         assert s.movies
         assert 'test' == s.by_id('movies', 1).actor.name
