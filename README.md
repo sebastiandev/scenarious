@@ -1,7 +1,7 @@
 # Scenarious   [![Build Status](https://travis-ci.org/sebastiandev/scenarious.svg?branch=development)](https://travis-ci.org/sebastiandev/scenarious)
 A Tool for creating testing scenarios
 
-Having fixtures or test scenarios defined in re-usable, combinable, shareable ways is a good thing as well as having them in a format that doesnt require coding habilities to understand them. Thats what scenarious offers
+Having fixtures or test scenarios defined in re-usable, combinable, shareable ways is a good thing as well as having them in a format that doesn't require coding abilities to understand them. Thats what scenarious offers
 
 ## Install
 ```pip install scenarious```
