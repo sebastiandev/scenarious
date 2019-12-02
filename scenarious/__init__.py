@@ -6,4 +6,4 @@ from .testing import scenario
 
 
 __author__ = "Sebastian Packmann"
-__version__ = '0.2.1'
+__version__ = '0.2.2'
