@@ -63,8 +63,9 @@ class ModuleLoader(object):
     def load(cls, paths=None, force=False):
         if cls._modules is None or force:
             cls._modules = []
-            loaded_files = []
-            _path = paths or cls.group_path
+            loaded_files = [] 
+            cls.group_path = [] if cls.group_path is None else cls.group_path
+            _path = paths or cls.group_path 
             _path = _path if type(_path) is list else [_path]
 
             for _p in _path:
@@ -73,7 +74,7 @@ class ModuleLoader(object):
                         if not cls.is_allowed_file(subfile):
                             continue
 
-                        module_name, module_ext = subfile.split('.')
+                        module_name, module_ext = os.path.splitext(subfile)
 
                         if module_name != '__init__' and module_ext == 'py':
                             submodule_path = os.path.join(path, subfile)
