@@ -54,7 +54,7 @@ class Scenario(object):
         if isinstance(source, dict):
             raw = source
         else:
-            raw = yaml.load(open(source) if isinstance(source, six.string_types) else source)
+            raw = yaml.full_load(open(source) if isinstance(source, six.string_types) else source)
 
         for entity, value in (raw or {}).items():
             objects = [{}] * value if isinstance(value, int) else value
