@@ -73,7 +73,8 @@ class ModuleLoader(object):
                         if not cls.is_allowed_file(subfile):
                             continue
 
-                        module_name, module_ext = subfile.split('.')
+                        module_name, module_ext = os.path.splitext(subfile)
+                        module_ext = module_ext.lstrip(".")
 
                         if module_name != '__init__' and module_ext == 'py':
                             submodule_path = os.path.join(path, subfile)
