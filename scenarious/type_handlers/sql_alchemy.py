@@ -38,7 +38,7 @@ class SQLAlchemyTypeHandler(TypeHandler):
         required_fields = cls.requirements()
         base_attrs = cls._base_attributes(cls)
 
-        for k in data.keys():
+        for k in list(data.keys()):
             if k.startswith('__'):
                 data.pop(k)
 
