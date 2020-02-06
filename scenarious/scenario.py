@@ -17,10 +17,10 @@ class ScenariousException(BaseError):
 class Scenario(object):
 
     @classmethod
-    def load(cls, source, type_handlers, load_priority=None, reference_handler=None, entity_store=None, autobuild=True):
+    def load(cls, sources, type_handlers, load_priority=None, reference_handler=None, entity_store=None, autobuild=True):
         """
         Builds the Scenario based on the scenario definition stored in source, using the provided type handlers
-        :param source: A config file path or config file object to load the scenario from or a dict already built
+        :param sources: A list of config file path or config file object to load the scenario from or a dict already built
         :param type_handlers: A list of handlers for every supported type
         :param load_priority: A list of type_names to be loaded first
         :param reference_handler: A reference parser
@@ -36,19 +36,26 @@ class Scenario(object):
         reference_handler = reference_handler or ReferenceHandler()
         entity_store = entity_store or EntityStore()
 
-        return cls(source, type_handlers_by_name, reference_handler=reference_handler, entity_store=entity_store,
+        if not isinstance(sources, list):
+            sources = [sources]
+
+        return cls(sources, type_handlers_by_name, reference_handler=reference_handler, entity_store=entity_store,
                    load_priority=load_priority, autobuild=autobuild)
 
-    def __init__(self, source, handlers_by_type_name, reference_handler, entity_store, load_priority=None, autobuild=True):
+    def __init__(self, sources, handlers_by_type_name, reference_handler, entity_store, load_priority=None, autobuild=True):
         self._raw_data = {}
         self._type_handlers = handlers_by_type_name
         self._ref_handler = reference_handler
         self._entity_store = entity_store
         self._load_priority = load_priority or []
-        self.update(source)
+        self.update_multiple(sources)
 
         if autobuild:
             self.build()
+
+    def update_multiple(self, sources):
+        for s in sources:
+            self.update(s)
 
     def update(self, source):
         if isinstance(source, dict):

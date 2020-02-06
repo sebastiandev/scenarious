@@ -295,4 +295,45 @@ class ScenariousTest(unittest.TestCase):
         assert 3 == len(s.actors)
         assert 3 == len(s.movies)
 
+    def test_load_multiple_scenarios(self):
+        scenarios = [
+            StringIO("""
+                actors:
+                  - name: test
+                    age: 20
 
+                  - id: 2
+                    name: test2
+                    age: 22
+
+                movies:
+                  - title: test movie 1
+                    genre: drama
+                    actor: $actor_1
+                    year: 2018
+
+                  - title: test movie 2
+                    genre: action
+                    actor: $actor_2
+                    year: 2018
+                """),
+            StringIO("""
+                actors:
+                  - name: actor added after
+                    age: 42
+
+                movies:
+                 - title: movie added after
+                   genre: comedy
+                   actor: $actor_1
+                   year: 2018
+
+                   
+                """),
+        ]
+        s = Scenario.load(scenarios, type_handlers=[ActorTypeHandler, MovieTypeHandler])
+
+        assert 3 == len(s.actors)
+        assert 3 == len(s.movies)
+
+        assert s.movies[2].actor is s.actors[0]
