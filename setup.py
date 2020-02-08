@@ -15,14 +15,14 @@ setup(
     name='scenarious',
     setup_requires=[
         'six',
-        'pyyaml',
-        'faker',
+        'pyyaml==5.2',
+        'faker==3.0.1',
         'dateparser',
     ],
     install_requires=[
         'six',
-        'pyyaml',
-        'faker',
+        'pyyaml==5.2',
+        'faker==3.0.1',
         'dateparser',
     ],
     version=get_version('scenarious'),
