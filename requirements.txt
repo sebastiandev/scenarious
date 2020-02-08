@@ -1,4 +1,4 @@
 six
 pyyaml
-faker
+faker==3.0.1
 dateparser
