@@ -16,13 +16,13 @@ setup(
     setup_requires=[
         'six',
         'pyyaml==5.2',
-        'faker==3.0.1',
+        'Faker==2.0.3',
         'dateparser',
     ],
     install_requires=[
         'six',
         'pyyaml==5.2',
-        'faker==3.0.1',
+        'Faker==2.0.3',
         'dateparser',
     ],
     version=get_version('scenarious'),
