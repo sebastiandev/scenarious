@@ -20,7 +20,8 @@ class Scenario(object):
     def load(cls, sources, type_handlers, load_priority=None, reference_handler=None, entity_store=None, autobuild=True):
         """
         Builds the Scenario based on the scenario definition stored in source, using the provided type handlers
-        :param sources: A list of config file path or config file object to load the scenario from or a dict already built
+        :param sources: A `source` or an iterable of `source`s. A `source` is a config file path or config file object
+        to load the scenario from or a dict already built
         :param type_handlers: A list of handlers for every supported type
         :param load_priority: A list of type_names to be loaded first
         :param reference_handler: A reference parser
@@ -36,7 +37,7 @@ class Scenario(object):
         reference_handler = reference_handler or ReferenceHandler()
         entity_store = entity_store or EntityStore()
 
-        if not isinstance(sources, list):
+        if not isinstance(sources, (list, tuple, set,)):
             sources = [sources]
 
         return cls(sources, type_handlers_by_name, reference_handler=reference_handler, entity_store=entity_store,
